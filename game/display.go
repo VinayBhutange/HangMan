@@ -6,23 +6,23 @@ import (
 	"os/exec"
 	"runtime"
 	"strings"
-	
+
 	"github.com/VinayBhutange/hangman-go/utils"
 )
 
 // ClearScreen clears the terminal screen
 func ClearScreen() {
 	var cmd *exec.Cmd
-	
+
 	switch runtime.GOOS {
 	case "windows":
 		cmd = exec.Command("cmd", "/c", "cls")
 	default:
 		cmd = exec.Command("clear")
 	}
-	
+
 	cmd.Stdout = os.Stdout
-	cmd.Run()
+	_ = cmd.Run() // Ignore error as it's non-critical
 }
 
 // DisplayWelcome shows the welcome message and game instructions
@@ -44,16 +44,16 @@ func DisplayGameState(g *Game) {
 	fmt.Println(utils.Bold("🎯 HANGMAN GAME"))
 	fmt.Println("===============")
 	fmt.Println()
-	
+
 	// Display hangman figure
 	DisplayHangman(g.WrongGuesses)
 	fmt.Println()
-	
+
 	// Display word progress with colors
 	displayWord := g.GetDisplayWord()
 	fmt.Printf("Word: %s\n", utils.Bold(utils.Cyan(displayWord)))
 	fmt.Println()
-	
+
 	// Display game statistics with colors
 	remaining := g.GetRemainingGuesses()
 	wrongColor := utils.Red
@@ -62,25 +62,25 @@ func DisplayGameState(g *Game) {
 	} else if g.WrongGuesses <= 4 {
 		wrongColor = utils.Yellow
 	}
-	
+
 	fmt.Printf("Wrong guesses: %s/%d\n", wrongColor(fmt.Sprintf("%d", g.WrongGuesses)), g.MaxWrongGuesses)
-	
+
 	remainingColor := utils.Green
 	if remaining <= 2 {
 		remainingColor = utils.Red
 	} else if remaining <= 3 {
 		remainingColor = utils.Yellow
 	}
-	
+
 	fmt.Printf("Remaining guesses: %s\n", remainingColor(fmt.Sprintf("%d", remaining)))
 	fmt.Println()
-	
+
 	// Display guessed letters with colors
 	wrongLetters := g.GetWrongLetters()
 	if len(wrongLetters) > 0 {
 		fmt.Printf("Wrong letters: %s\n", utils.Red(formatLetters(wrongLetters)))
 	}
-	
+
 	guessedLetters := g.GetGuessedLetters()
 	if len(guessedLetters) > 0 {
 		fmt.Printf("All guessed letters: %s\n", utils.Blue(formatLetters(guessedLetters)))
@@ -155,7 +155,7 @@ func DisplayHangman(wrongGuesses int) {
        |
 =========`,
 	}
-	
+
 	if wrongGuesses >= 0 && wrongGuesses < len(stages) {
 		fmt.Print(stages[wrongGuesses])
 	}
@@ -210,12 +210,12 @@ func formatLetters(letters []rune) string {
 	if len(letters) == 0 {
 		return ""
 	}
-	
+
 	var strs []string
 	for _, letter := range letters {
 		strs = append(strs, string(letter))
 	}
-	
+
 	return strings.Join(strs, ", ")
 }
 

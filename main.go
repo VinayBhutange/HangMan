@@ -16,14 +16,14 @@ func main() {
 	fmt.Print(assets.GameTitle())
 	fmt.Println(utils.Bold("\nWelcome to Hangman!"))
 	fmt.Println("===================")
-	
+
 	// Load statistics
 	stats, err := game.LoadStatistics()
 	if err != nil {
 		log.Printf("Warning: Could not load statistics: %v", err)
 		stats = game.NewStatistics()
 	}
-	
+
 	// Load words
 	wordList, err := loadWords()
 	if err != nil {
@@ -31,17 +31,17 @@ func main() {
 		log.Println("Using default word list instead.")
 		wordList = game.GetDefaultWords()
 	}
-	
+
 	// Show welcome message with statistics
 	if stats.GamesPlayed > 0 {
-		fmt.Printf("Welcome back! You've played %d games with a %.1f%% win rate.\n\n", 
+		fmt.Printf("Welcome back! You've played %d games with a %.1f%% win rate.\n\n",
 			stats.GamesPlayed, stats.GetWinRate())
 	}
-	
+
 	// Main menu loop
 	for {
 		choice := showMainMenu()
-		
+
 		switch choice {
 		case "1":
 			// Play game
@@ -61,7 +61,7 @@ func main() {
 		default:
 			fmt.Println(utils.Error("Invalid choice. Please try again."))
 		}
-		
+
 		game.ClearScreen()
 	}
 }
@@ -75,13 +75,13 @@ func showMainMenu() string {
 	fmt.Println("3. ⚙️  Settings")
 	fmt.Println("4. 🚪 Exit")
 	fmt.Println()
-	
+
 	choice, err := utils.GetUserInput("Enter your choice (1-4): ")
 	if err != nil {
 		fmt.Println(utils.Error("Error reading input: " + err.Error()))
 		return ""
 	}
-	
+
 	return strings.TrimSpace(choice)
 }
 
@@ -96,13 +96,13 @@ func showSettingsMenu(wordList *game.WordList, stats *game.Statistics) {
 		fmt.Println("4. 🔄 Reset Statistics")
 		fmt.Println("5. 🔙 Back to Main Menu")
 		fmt.Println()
-		
+
 		choice, err := utils.GetUserInput("Enter your choice (1-5): ")
 		if err != nil {
 			fmt.Println(utils.Error("Error reading input: " + err.Error()))
 			continue
 		}
-		
+
 		switch strings.TrimSpace(choice) {
 		case "1":
 			addCustomWord(wordList)
@@ -117,7 +117,7 @@ func showSettingsMenu(wordList *game.WordList, stats *game.Statistics) {
 		default:
 			fmt.Println(utils.Error("Invalid choice. Please try again."))
 		}
-		
+
 		fmt.Println()
 	}
 }
@@ -130,35 +130,35 @@ func playHangmanGame(wordList *game.WordList, stats *game.Statistics) {
 		fmt.Printf("Error: %v\n", err)
 		return
 	}
-	
+
 	// Get words for selected difficulty
 	words := wordList.GetWordsByDifficulty(difficulty)
 	if len(words) == 0 {
 		fmt.Println(utils.Warning("No words available for selected difficulty. Using all words."))
 		words = wordList.Words
 	}
-	
+
 	// Start new game
 	hangmanGame := game.NewGame(words)
-	
+
 	// Play the game
 	won := playGame(hangmanGame)
-	
+
 	// Record statistics
 	stats.RecordGame(hangmanGame, difficulty)
-	
+
 	// Save statistics
 	if err := stats.SaveStatistics(); err != nil {
 		log.Printf("Warning: Could not save statistics: %v", err)
 	}
-	
+
 	// Show brief stats
 	if won {
 		fmt.Printf(utils.Success("Game won! Current streak: %d\n"), stats.CurrentStreak)
 	} else {
 		fmt.Printf(utils.Error("Game lost. Win rate: %.1f%%\n"), stats.GetWinRate())
 	}
-	
+
 	utils.WaitForEnter()
 }
 
@@ -168,12 +168,12 @@ func loadWords() (*game.WordList, error) {
 	if _, err := os.Stat("data/words.txt"); err == nil {
 		return game.LoadWordsFromFile("data/words.txt")
 	}
-	
+
 	// If that fails, try relative path
 	if _, err := os.Stat("./data/words.txt"); err == nil {
 		return game.LoadWordsFromFile("./data/words.txt")
 	}
-	
+
 	return nil, fmt.Errorf("word file not found")
 }
 
@@ -191,27 +191,27 @@ func getDifficulty() (string, error) {
 
 // playGame plays a single game and returns true if player won
 func playGame(g *game.Game) bool {
-	fmt.Printf(utils.Info("Starting new game!\n"))
+	fmt.Print(utils.Info("Starting new game!\n"))
 	fmt.Printf("The word has %d letters.\n\n", len(g.Word))
-	
+
 	// Game loop
 	for !g.IsGameOver {
 		// Display current game state
 		game.DisplayGameState(g)
-		
+
 		// Get letter input from user
 		letter, err := getLetterInput(g)
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
 			continue
 		}
-		
+
 		// Process the guess
 		isCorrect := g.GuessLetter(letter)
-		
+
 		// Clear screen and show feedback
 		game.ClearScreen()
-		
+
 		if isCorrect {
 			fmt.Println(utils.Success(fmt.Sprintf("Great! '%c' is in the word!", letter)))
 		} else {
@@ -219,10 +219,10 @@ func playGame(g *game.Game) bool {
 		}
 		fmt.Println()
 	}
-	
+
 	// Display final game state
 	game.DisplayGameState(g)
-	
+
 	// Show win/lose message
 	if g.IsWon {
 		fmt.Print(assets.WinMessage())
@@ -244,13 +244,13 @@ func getLetterInput(g *game.Game) (rune, error) {
 			fmt.Println("Please enter a single letter (A-Z)")
 			continue
 		}
-		
+
 		// Check if letter was already guessed
 		if g.GuessedLetters[letter] {
 			fmt.Println(utils.Warning(fmt.Sprintf("You already guessed '%c'! Try a different letter.", letter)))
 			continue
 		}
-		
+
 		return letter, nil
 	}
 }
@@ -262,12 +262,12 @@ func addCustomWord(wordList *game.WordList) {
 		fmt.Println(utils.Error("Error reading input: " + err.Error()))
 		return
 	}
-	
+
 	if !utils.IsValidWord(word) {
 		fmt.Println(utils.Error("Invalid word. Word must be 3+ letters and contain only alphabetic characters."))
 		return
 	}
-	
+
 	wordList.AddWord(word)
 	fmt.Println(utils.Success(fmt.Sprintf("Added '%s' to word list!", strings.ToUpper(word))))
 }
@@ -279,10 +279,10 @@ func removeWord(wordList *game.WordList) {
 		fmt.Println(utils.Error("Error reading input: " + err.Error()))
 		return
 	}
-	
+
 	originalCount := wordList.GetWordCount()
 	wordList.RemoveWord(word)
-	
+
 	if wordList.GetWordCount() < originalCount {
 		fmt.Println(utils.Success(fmt.Sprintf("Removed '%s' from word list!", strings.ToUpper(word))))
 	} else {
@@ -294,7 +294,7 @@ func removeWord(wordList *game.WordList) {
 func listWords(wordList *game.WordList) {
 	fmt.Printf(utils.Bold("📋 WORD LIST (%d words)\n"), wordList.GetWordCount())
 	fmt.Println("===============")
-	
+
 	words := wordList.Words
 	for i, word := range words {
 		fmt.Printf("%3d. %s\n", i+1, word)
@@ -305,7 +305,7 @@ func listWords(wordList *game.WordList) {
 			}
 		}
 	}
-	
+
 	fmt.Println()
 	utils.WaitForEnter()
 }
@@ -317,7 +317,7 @@ func resetStatistics(stats *game.Statistics) {
 		fmt.Println(utils.Error("Error reading input: " + err.Error()))
 		return
 	}
-	
+
 	if confirm {
 		stats.ResetStatistics()
 		if err := stats.SaveStatistics(); err != nil {
@@ -326,14 +326,14 @@ func resetStatistics(stats *game.Statistics) {
 			fmt.Println(utils.Success("Statistics reset successfully!"))
 		}
 	} else {
-		fmt.Println(utils.Info("Statistics reset cancelled."))
+		fmt.Println(utils.Info("Statistics reset canceled."))
 	}
 }
 
 // printFinalStats prints final statistics when exiting
 func printFinalStats(stats *game.Statistics) {
 	if stats.GamesPlayed > 0 {
-		fmt.Printf("Final Statistics - Games: %d, Won: %d, Win Rate: %.1f%%\n", 
+		fmt.Printf("Final Statistics - Games: %d, Won: %d, Win Rate: %.1f%%\n",
 			stats.GamesPlayed, stats.GamesWon, stats.GetWinRate())
 		if stats.LongestStreak > 0 {
 			fmt.Printf("Your best winning streak was: %d games!\n", stats.LongestStreak)

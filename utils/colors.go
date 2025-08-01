@@ -1,3 +1,4 @@
+// Package utils provides utility functions for input handling, validation, and terminal colors.
 package utils
 
 import (
@@ -24,7 +25,7 @@ func ColorSupported() bool {
 	if runtime.GOOS == "windows" {
 		return false
 	}
-	
+
 	// Check if we're in a terminal that likely supports colors
 	term := os.Getenv("TERM")
 	return term != "" && term != "dumb"

@@ -7,16 +7,22 @@ import (
 	"strings"
 )
 
+const (
+	difficultyEasy   = "easy"
+	difficultyMedium = "medium"
+	difficultyHard   = "hard"
+)
+
 // GetUserInput reads a line of input from the user
 func GetUserInput(prompt string) (string, error) {
 	fmt.Print(prompt)
-	
+
 	reader := bufio.NewReader(os.Stdin)
 	input, err := reader.ReadString('\n')
 	if err != nil {
 		return "", err
 	}
-	
+
 	return strings.TrimSpace(input), nil
 }
 
@@ -26,18 +32,18 @@ func GetLetterInput() (rune, error) {
 	if err != nil {
 		return 0, err
 	}
-	
+
 	// Validate input
 	if len(input) != 1 {
 		return 0, fmt.Errorf("please enter exactly one letter")
 	}
-	
+
 	letter := rune(strings.ToUpper(input)[0])
-	
+
 	if !IsLetter(letter) {
 		return 0, fmt.Errorf("please enter a valid letter (A-Z)")
 	}
-	
+
 	return letter, nil
 }
 
@@ -47,9 +53,9 @@ func GetYesNoInput(prompt string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	
+
 	input = strings.ToLower(input)
-	
+
 	switch input {
 	case "y", "yes":
 		return true, nil
@@ -63,7 +69,7 @@ func GetYesNoInput(prompt string) (bool, error) {
 // WaitForEnter waits for the user to press Enter
 func WaitForEnter() {
 	fmt.Print("Press Enter to continue...")
-	bufio.NewReader(os.Stdin).ReadString('\n')
+	_, _ = bufio.NewReader(os.Stdin).ReadString('\n') // Ignore error
 }
 
 // GetDifficultyInput gets difficulty level from user
@@ -73,19 +79,20 @@ func GetDifficultyInput() (string, error) {
 	fmt.Println("2. Medium (6-8 letters)")
 	fmt.Println("3. Hard (9+ letters)")
 	fmt.Println()
-	
+
 	input, err := GetUserInput("Enter your choice (1-3): ")
 	if err != nil {
 		return "", err
 	}
-	
-	switch input {
+
+	choice := strings.TrimSpace(input)
+	switch choice {
 	case "1":
-		return "easy", nil
+		return difficultyEasy, nil
 	case "2":
-		return "medium", nil
+		return difficultyMedium, nil
 	case "3":
-		return "hard", nil
+		return difficultyHard, nil
 	default:
 		return "", fmt.Errorf("please enter 1, 2, or 3")
 	}

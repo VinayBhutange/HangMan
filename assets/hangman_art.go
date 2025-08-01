@@ -1,3 +1,4 @@
+// Package assets contains game art and visual elements for the hangman game.
 package assets
 
 // HangmanStages contains all the ASCII art stages for the hangman

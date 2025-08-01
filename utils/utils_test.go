@@ -12,7 +12,7 @@ func TestIsLetterInternal(t *testing.T) {
 			t.Errorf("Expected '%c' to be valid", letter)
 		}
 	}
-	
+
 	// Test invalid inputs
 	invalidLetters := []rune{'1', '!', ' ', '@'}
 	for _, letter := range invalidLetters {
@@ -30,7 +30,7 @@ func TestIsAlphabeticInternal(t *testing.T) {
 			t.Errorf("Expected '%s' to be alphabetic", input)
 		}
 	}
-	
+
 	// Test invalid strings
 	invalidInputs := []string{"", "hello123", "test!", " "}
 	for _, input := range invalidInputs {
@@ -42,12 +42,12 @@ func TestIsAlphabeticInternal(t *testing.T) {
 
 func TestContainsRuneInternal(t *testing.T) {
 	letters := []rune{'A', 'B', 'C'}
-	
+
 	// Test letter that exists
 	if !ContainsRune(letters, 'B') {
 		t.Error("Expected to find 'B' in the slice")
 	}
-	
+
 	// Test letter that doesn't exist
 	if ContainsRune(letters, 'Z') {
 		t.Error("Did not expect to find 'Z' in the slice")
@@ -62,7 +62,7 @@ func TestIsValidWordInternal(t *testing.T) {
 			t.Errorf("Expected '%s' to be valid", word)
 		}
 	}
-	
+
 	// Test invalid words
 	invalidWords := []string{"", "A", "AB", "test123"}
 	for _, word := range invalidWords {
@@ -80,7 +80,7 @@ func TestIsValidDifficultyInternal(t *testing.T) {
 			t.Errorf("Expected '%s' to be valid", difficulty)
 		}
 	}
-	
+
 	// Test invalid difficulties
 	invalidDifficulties := []string{"", "impossible", "normal"}
 	for _, difficulty := range invalidDifficulties {
@@ -95,12 +95,12 @@ func TestColorizeInternal(t *testing.T) {
 	if result == "" {
 		t.Error("Colorize should not return empty string")
 	}
-	
+
 	// Test color functions
 	if Red("test") == "" {
 		t.Error("Red function should not return empty string")
 	}
-	
+
 	if Green("test") == "" {
 		t.Error("Green function should not return empty string")
 	}

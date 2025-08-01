@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+const fallbackWord = "GOLANG"
+
 // WordList represents a collection of words for the game
 type WordList struct {
 	Words []string
@@ -16,15 +18,19 @@ type WordList struct {
 
 // LoadWordsFromFile loads words from a text file
 func LoadWordsFromFile(filename string) (*WordList, error) {
+	// Open file for reading
+	//nolint:gosec // G304: File path is controlled by the application
 	file, err := os.Open(filename)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open word file: %w", err)
 	}
-	defer file.Close()
+	defer func() {
+		_ = file.Close() // Ignore error on close
+	}()
 
 	var words []string
 	scanner := bufio.NewScanner(file)
-	
+
 	for scanner.Scan() {
 		word := strings.TrimSpace(scanner.Text())
 		if word != "" && len(word) >= 3 { // Only include words with 3+ letters
@@ -60,30 +66,31 @@ func GetDefaultWords() *WordList {
 		"GRAPH", "NODE", "EDGE", "VERTEX", "SEARCH",
 		"SORT", "MERGE", "QUICK", "BUBBLE", "INSERTION",
 	}
-	
+
 	return &WordList{Words: words}
 }
 
 // GetRandomWord returns a random word from the word list
 func (wl *WordList) GetRandomWord() string {
 	if len(wl.Words) == 0 {
-		return "GOLANG" // Fallback word
+		return fallbackWord // Fallback word
 	}
-	
+
 	rand.Seed(time.Now().UnixNano())
+	//nolint:gosec // G404: Using weak random number generator is acceptable for game purposes
 	return wl.Words[rand.Intn(len(wl.Words))]
 }
 
 // GetWordsByLength returns words of a specific length range
 func (wl *WordList) GetWordsByLength(minLen, maxLen int) []string {
 	var filtered []string
-	
+
 	for _, word := range wl.Words {
 		if len(word) >= minLen && len(word) <= maxLen {
 			filtered = append(filtered, word)
 		}
 	}
-	
+
 	return filtered
 }
 
