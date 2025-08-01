@@ -70,7 +70,7 @@ func (s *Statistics) SaveStatistics() error {
 
 	// Create directory if it doesn't exist
 	dir := filepath.Dir(statsFile)
-	if err := os.MkdirAll(dir, 0750); err != nil { // More restrictive permissions
+	if err := os.MkdirAll(dir, 0o750); err != nil { // More restrictive permissions
 		return fmt.Errorf("failed to create stats directory: %w", err)
 	}
 
@@ -80,7 +80,7 @@ func (s *Statistics) SaveStatistics() error {
 	}
 
 	// Write to file with restricted permissions
-	if err := os.WriteFile(statsFile, data, 0600); err != nil { // More restrictive permissions
+	if err := os.WriteFile(statsFile, data, 0o600); err != nil { // More restrictive permissions
 		return fmt.Errorf("failed to write statistics file: %w", err)
 	}
 

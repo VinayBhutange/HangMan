@@ -35,9 +35,9 @@ func TestRecordGame(t *testing.T) {
 	stats := game.NewStatistics()
 
 	// Create a won game
-	words := []string{"GO"} // Use shorter word for easier testing
+	words := []string{testWordGo} // Use shorter word for easier testing
 	g := game.NewGame(words)
-	g.Word = "GO"
+	g.Word = testWordGo
 	g.GuessLetter('X') // Wrong guess first
 	g.GuessLetter('G')
 	g.GuessLetter('O')
@@ -75,8 +75,8 @@ func TestRecordGame(t *testing.T) {
 		t.Errorf("Expected medium difficulty count to be 1, got %d", stats.Difficulties["medium"])
 	}
 
-	if len(stats.WordsGuessed) != 1 || stats.WordsGuessed[0] != "GO" {
-		t.Errorf("Expected WordsGuessed to contain 'GO', got %v", stats.WordsGuessed)
+	if len(stats.WordsGuessed) != 1 || stats.WordsGuessed[0] != testWordGo {
+		t.Errorf("Expected WordsGuessed to contain %q, got %v", testWordGo, stats.WordsGuessed)
 	}
 }
 

@@ -32,7 +32,7 @@ func TestGetDefaultWords(t *testing.T) {
 }
 
 func TestGetRandomWord(t *testing.T) {
-	words := []string{"GOLANG", "PROGRAMMING", "COMPUTER"}
+	words := []string{testWordGolang, "PROGRAMMING", "COMPUTER"}
 	wordList := &game.WordList{Words: words}
 
 	randomWord := wordList.GetRandomWord()
@@ -52,12 +52,12 @@ func TestGetRandomWord(t *testing.T) {
 }
 
 func TestGetWordsByLength(t *testing.T) {
-	words := []string{"GO", "LANG", "GOLANG", "PROGRAMMING"}
+	words := []string{testWordGo, "LANG", testWordGolang, "PROGRAMMING"}
 	wordList := &game.WordList{Words: words}
 
 	// Test filtering by length
 	shortWords := wordList.GetWordsByLength(2, 4)
-	expectedShort := []string{"GO", "LANG"}
+	expectedShort := []string{testWordGo, "LANG"}
 
 	if len(shortWords) != len(expectedShort) {
 		t.Errorf("Expected %d short words, got %d", len(expectedShort), len(shortWords))
@@ -101,7 +101,7 @@ func TestGetWordsByDifficulty(t *testing.T) {
 }
 
 func TestAddWord(t *testing.T) {
-	wordList := &game.WordList{Words: []string{"GOLANG"}}
+	wordList := &game.WordList{Words: []string{testWordGolang}}
 	originalCount := len(wordList.Words)
 
 	// Add valid word
@@ -116,7 +116,7 @@ func TestAddWord(t *testing.T) {
 	}
 
 	// Try to add invalid word (too short)
-	wordList.AddWord("GO")
+	wordList.AddWord(testWordGo)
 	if len(wordList.Words) != originalCount+1 {
 		t.Error("Short word should not be added")
 	}
@@ -129,7 +129,7 @@ func TestAddWord(t *testing.T) {
 }
 
 func TestRemoveWord(t *testing.T) {
-	wordList := &game.WordList{Words: []string{"GOLANG", "PROGRAMMING", "COMPUTER"}}
+	wordList := &game.WordList{Words: []string{testWordGolang, "PROGRAMMING", "COMPUTER"}}
 	originalCount := len(wordList.Words)
 
 	// Remove existing word
@@ -153,7 +153,7 @@ func TestRemoveWord(t *testing.T) {
 }
 
 func TestGetWordCount(t *testing.T) {
-	words := []string{"GOLANG", "PROGRAMMING", "COMPUTER"}
+	words := []string{testWordGolang, "PROGRAMMING", "COMPUTER"}
 	wordList := &game.WordList{Words: words}
 
 	count := wordList.GetWordCount()
