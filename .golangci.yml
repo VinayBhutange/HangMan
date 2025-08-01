@@ -19,11 +19,6 @@ linters:
     - unparam
   disable:
     - depguard  # Disable overly restrictive import rules
-    - deadcode  # Deprecated
-    - structcheck  # Deprecated
-    - varcheck  # Deprecated
-    - exportloopref  # Not needed for Go 1.22+
-    - gomnd  # Deprecated (renamed to mnd)
 
 linters-settings:
   errcheck:
@@ -83,7 +78,9 @@ issues:
 
 output:
   formats:
-    - format: github-actions
+    - format: colored-line-number
   print-issued-line: true
   print-linter-name: true
+
+issues:
   uniq-by-line: false

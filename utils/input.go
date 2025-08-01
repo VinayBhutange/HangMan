@@ -69,7 +69,7 @@ func GetYesNoInput(prompt string) (bool, error) {
 // WaitForEnter waits for the user to press Enter
 func WaitForEnter() {
 	fmt.Print("Press Enter to continue...")
-	_, _ = bufio.NewReader(os.Stdin).ReadString('\n') // Ignore error
+	_, _ = bufio.NewReader(os.Stdin).ReadString('\n') //nolint:errcheck // Ignore error for continue prompt
 }
 
 // GetDifficultyInput gets difficulty level from user

@@ -125,11 +125,7 @@ func showSettingsMenu(wordList *game.WordList, stats *game.Statistics) {
 // playHangmanGame plays a single game session
 func playHangmanGame(wordList *game.WordList, stats *game.Statistics) {
 	// Get difficulty level
-	difficulty, err := getDifficulty()
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		return
-	}
+	difficulty := getDifficulty()
 
 	// Get words for selected difficulty
 	words := wordList.GetWordsByDifficulty(difficulty)
@@ -178,14 +174,14 @@ func loadWords() (*game.WordList, error) {
 }
 
 // getDifficulty gets the difficulty level from the user
-func getDifficulty() (string, error) {
+func getDifficulty() string {
 	for {
 		difficulty, err := utils.GetDifficultyInput()
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
 			continue
 		}
-		return difficulty, nil
+		return difficulty
 	}
 }
 
@@ -200,11 +196,7 @@ func playGame(g *game.Game) bool {
 		game.DisplayGameState(g)
 
 		// Get letter input from user
-		letter, err := getLetterInput(g)
-		if err != nil {
-			fmt.Printf("Error: %v\n", err)
-			continue
-		}
+		letter := getLetterInput(g)
 
 		// Process the guess
 		isCorrect := g.GuessLetter(letter)
@@ -236,7 +228,7 @@ func playGame(g *game.Game) bool {
 }
 
 // getLetterInput gets a valid letter input from the user
-func getLetterInput(g *game.Game) (rune, error) {
+func getLetterInput(g *game.Game) rune {
 	for {
 		letter, err := utils.GetLetterInput()
 		if err != nil {
@@ -251,7 +243,7 @@ func getLetterInput(g *game.Game) (rune, error) {
 			continue
 		}
 
-		return letter, nil
+		return letter
 	}
 }
 

@@ -22,7 +22,7 @@ func ClearScreen() {
 	}
 
 	cmd.Stdout = os.Stdout
-	_ = cmd.Run() // Ignore error as it's non-critical
+	_ = cmd.Run() //nolint:errcheck // Ignore error as screen clearing is non-critical
 }
 
 // DisplayWelcome shows the welcome message and game instructions

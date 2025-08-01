@@ -25,7 +25,7 @@ func LoadWordsFromFile(filename string) (*WordList, error) {
 		return nil, fmt.Errorf("failed to open word file: %w", err)
 	}
 	defer func() {
-		_ = file.Close() // Ignore error on close
+		_ = file.Close() //nolint:errcheck // Ignore error on close in defer
 	}()
 
 	var words []string
