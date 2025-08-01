@@ -3,7 +3,7 @@ package tests
 import (
 	"testing"
 
-	"hangman-go/game"
+	"github.com/VinayBhutange/hangman-go/game"
 )
 
 func TestGetDefaultWords(t *testing.T) {

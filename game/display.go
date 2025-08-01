@@ -7,7 +7,7 @@ import (
 	"runtime"
 	"strings"
 	
-	"hangman-go/utils"
+	"github.com/VinayBhutange/hangman-go/utils"
 )
 
 // ClearScreen clears the terminal screen

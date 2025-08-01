@@ -6,9 +6,9 @@ import (
 	"os"
 	"strings"
 
-	"hangman-go/assets"
-	"hangman-go/game"
-	"hangman-go/utils"
+	"github.com/VinayBhutange/hangman-go/assets"
+	"github.com/VinayBhutange/hangman-go/game"
+	"github.com/VinayBhutange/hangman-go/utils"
 )
 
 func main() {

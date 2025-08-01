@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"hangman-go/game"
+	"github.com/VinayBhutange/hangman-go/game"
 )
 
 func TestNewStatistics(t *testing.T) {
