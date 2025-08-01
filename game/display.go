@@ -6,6 +6,8 @@ import (
 	"os/exec"
 	"runtime"
 	"strings"
+	
+	"hangman-go/utils"
 )
 
 // ClearScreen clears the terminal screen
@@ -25,10 +27,10 @@ func ClearScreen() {
 
 // DisplayWelcome shows the welcome message and game instructions
 func DisplayWelcome() {
-	fmt.Println("🎮 WELCOME TO HANGMAN GAME! 🎮")
+	fmt.Println(utils.Bold("🎮 WELCOME TO HANGMAN GAME! 🎮"))
 	fmt.Println("================================")
 	fmt.Println()
-	fmt.Println("📖 HOW TO PLAY:")
+	fmt.Println(utils.Blue("📖 HOW TO PLAY:"))
 	fmt.Println("• Guess the hidden word letter by letter")
 	fmt.Println("• You have 6 wrong guesses before you lose")
 	fmt.Println("• Enter one letter at a time")
@@ -39,7 +41,7 @@ func DisplayWelcome() {
 
 // DisplayGameState shows the current state of the game
 func DisplayGameState(g *Game) {
-	fmt.Println("🎯 HANGMAN GAME")
+	fmt.Println(utils.Bold("🎯 HANGMAN GAME"))
 	fmt.Println("===============")
 	fmt.Println()
 	
@@ -47,24 +49,41 @@ func DisplayGameState(g *Game) {
 	DisplayHangman(g.WrongGuesses)
 	fmt.Println()
 	
-	// Display word progress
-	fmt.Printf("Word: %s\n", g.GetDisplayWord())
+	// Display word progress with colors
+	displayWord := g.GetDisplayWord()
+	fmt.Printf("Word: %s\n", utils.Bold(utils.Cyan(displayWord)))
 	fmt.Println()
 	
-	// Display game statistics
-	fmt.Printf("Wrong guesses: %d/%d\n", g.WrongGuesses, g.MaxWrongGuesses)
-	fmt.Printf("Remaining guesses: %d\n", g.GetRemainingGuesses())
+	// Display game statistics with colors
+	remaining := g.GetRemainingGuesses()
+	wrongColor := utils.Red
+	if g.WrongGuesses <= 2 {
+		wrongColor = utils.Green
+	} else if g.WrongGuesses <= 4 {
+		wrongColor = utils.Yellow
+	}
+	
+	fmt.Printf("Wrong guesses: %s/%d\n", wrongColor(fmt.Sprintf("%d", g.WrongGuesses)), g.MaxWrongGuesses)
+	
+	remainingColor := utils.Green
+	if remaining <= 2 {
+		remainingColor = utils.Red
+	} else if remaining <= 3 {
+		remainingColor = utils.Yellow
+	}
+	
+	fmt.Printf("Remaining guesses: %s\n", remainingColor(fmt.Sprintf("%d", remaining)))
 	fmt.Println()
 	
-	// Display guessed letters
+	// Display guessed letters with colors
 	wrongLetters := g.GetWrongLetters()
 	if len(wrongLetters) > 0 {
-		fmt.Printf("Wrong letters: %s\n", formatLetters(wrongLetters))
+		fmt.Printf("Wrong letters: %s\n", utils.Red(formatLetters(wrongLetters)))
 	}
 	
 	guessedLetters := g.GetGuessedLetters()
 	if len(guessedLetters) > 0 {
-		fmt.Printf("All guessed letters: %s\n", formatLetters(guessedLetters))
+		fmt.Printf("All guessed letters: %s\n", utils.Blue(formatLetters(guessedLetters)))
 	}
 	fmt.Println()
 }
