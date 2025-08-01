@@ -75,12 +75,12 @@ issues:
   
   # Maximum count of issues with the same text
   max-same-issues: 0
+  
+  # Unique issues per line
+  uniq-by-line: false
 
 output:
   formats:
     - format: colored-line-number
   print-issued-line: true
   print-linter-name: true
-
-issues:
-  uniq-by-line: false
