@@ -13,10 +13,9 @@ env:
 jobs:
   test:
     name: Test
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
         go-version: ['1.20', '1.21']
     
     steps:
@@ -34,9 +33,9 @@ jobs:
         path: |
           ~/go/pkg/mod
           ~/.cache/go-build
-        key: ${{ runner.os }}-go-${{ matrix.go-version }}-${{ hashFiles('**/go.sum') }}
+        key: linux-go-${{ matrix.go-version }}-${{ hashFiles('**/go.sum') }}
         restore-keys: |
-          ${{ runner.os }}-go-${{ matrix.go-version }}-
+          linux-go-${{ matrix.go-version }}-
           
     - name: Download dependencies
       run: go mod download
@@ -47,8 +46,8 @@ jobs:
     - name: Run tests
       run: go test -v -race -coverprofile=coverage.out ./...
       
-    - name: Check test coverage (Ubuntu only)
-      if: matrix.os == 'ubuntu-latest' && matrix.go-version == '1.21'
+    - name: Check test coverage
+      if: matrix.go-version == '1.21'
       shell: bash
       run: |
         go tool cover -func=coverage.out
@@ -68,7 +67,7 @@ jobs:
         fi
       
     - name: Upload coverage to Codecov
-      if: matrix.os == 'ubuntu-latest' && matrix.go-version == '1.21'
+      if: matrix.go-version == '1.21'
       uses: codecov/codecov-action@v4
       with:
         file: ./coverage.out
@@ -124,12 +123,7 @@ jobs:
     needs: [test, lint]
     strategy:
       matrix:
-        goos: [linux, windows, darwin]
         goarch: [amd64, arm64]
-        exclude:
-          # Exclude combinations that don't make sense
-          - goos: windows
-            goarch: arm64
     
     steps:
     - name: Checkout code
@@ -142,20 +136,17 @@ jobs:
         
     - name: Build binary
       env:
-        GOOS: ${{ matrix.goos }}
+        GOOS: linux
         GOARCH: ${{ matrix.goarch }}
       run: |
         mkdir -p build
-        BINARY_NAME=hangman-${{ matrix.goos }}-${{ matrix.goarch }}
-        if [ "${{ matrix.goos }}" = "windows" ]; then
-          BINARY_NAME="${BINARY_NAME}.exe"
-        fi
+        BINARY_NAME=hangman-linux-${{ matrix.goarch }}
         go build -ldflags="-s -w" -o build/${BINARY_NAME} main.go
         
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: hangman-${{ matrix.goos }}-${{ matrix.goarch }}
+        name: hangman-linux-${{ matrix.goarch }}
         path: build/
 
   docker:

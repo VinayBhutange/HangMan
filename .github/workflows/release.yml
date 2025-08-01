@@ -100,15 +100,6 @@ jobs:
           - goos: linux
             goarch: arm64
             asset_name: hangman-linux-arm64
-          - goos: windows
-            goarch: amd64
-            asset_name: hangman-windows-amd64.exe
-          - goos: darwin
-            goarch: amd64
-            asset_name: hangman-macos-amd64
-          - goos: darwin
-            goarch: arm64
-            asset_name: hangman-macos-arm64
     
     steps:
     - name: Checkout code
@@ -130,15 +121,9 @@ jobs:
     - name: Create archive
       id: archive
       run: |
-        if [[ "${{ matrix.goos }}" == "windows" ]]; then
-          zip -r ${{ matrix.asset_name }}.zip ${{ matrix.asset_name }} README.md LICENSE
-          echo "asset_name=${{ matrix.asset_name }}.zip" >> $GITHUB_OUTPUT
-          echo "content_type=application/zip" >> $GITHUB_OUTPUT
-        else
-          tar -czf ${{ matrix.asset_name }}.tar.gz ${{ matrix.asset_name }} README.md LICENSE
-          echo "asset_name=${{ matrix.asset_name }}.tar.gz" >> $GITHUB_OUTPUT
-          echo "content_type=application/gzip" >> $GITHUB_OUTPUT
-        fi
+        tar -czf ${{ matrix.asset_name }}.tar.gz ${{ matrix.asset_name }} README.md LICENSE
+        echo "asset_name=${{ matrix.asset_name }}.tar.gz" >> $GITHUB_OUTPUT
+        echo "content_type=application/gzip" >> $GITHUB_OUTPUT
         
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1
