@@ -1,5 +1,12 @@
 # Hangman Game in Go 🎮
 
+[![CI/CD Pipeline](https://github.com/[your-username]/hangman-go/actions/workflows/ci.yml/badge.svg)](https://github.com/[your-username]/hangman-go/actions/workflows/ci.yml)
+[![Code Quality](https://github.com/[your-username]/hangman-go/actions/workflows/quality.yml/badge.svg)](https://github.com/[your-username]/hangman-go/actions/workflows/quality.yml)
+[![codecov](https://codecov.io/gh/[your-username]/hangman-go/branch/main/graph/badge.svg)](https://codecov.io/gh/[your-username]/hangman-go)
+[![Go Report Card](https://goreportcard.com/badge/github.com/[your-username]/hangman-go)](https://goreportcard.com/report/github.com/[your-username]/hangman-go)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Docker Pulls](https://img.shields.io/docker/pulls/[your-username]/hangman-go)](https://hub.docker.com/r/[your-username]/hangman-go)
+
 A terminal-based Hangman game built with Go to practice fundamental programming concepts and game logic implementation.
 
 ## 🎯 Project Overview
@@ -28,31 +35,59 @@ This project is a classic Hangman word-guessing game implemented in Go, designed
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Go 1.19 or higher
+- Go 1.20 or higher
 - Terminal/Command prompt
 
 ### Installation
 
-1. Clone the repository:
+#### Option 1: Download Binary (Recommended)
+1. Go to the [Releases](https://github.com/[your-username]/hangman-go/releases) page
+2. Download the binary for your operating system:
+   - `hangman-linux-amd64.tar.gz` for Linux (64-bit)
+   - `hangman-windows-amd64.exe.zip` for Windows (64-bit)
+   - `hangman-macos-amd64.tar.gz` for macOS (Intel)
+   - `hangman-macos-arm64.tar.gz` for macOS (Apple Silicon)
+3. Extract and run:
+```bash
+# Linux/macOS
+tar -xzf hangman-*.tar.gz
+chmod +x hangman-*
+./hangman-*
+
+# Windows
+# Extract the zip file and run hangman-windows-amd64.exe
+```
+
+#### Option 2: Install with Go
+```bash
+go install github.com/[your-username]/hangman-go@latest
+hangman-go
+```
+
+#### Option 3: Clone and Build
 ```bash
 git clone https://github.com/[your-username]/hangman-go.git
 cd hangman-go
-```
-
-2. Initialize Go module:
-```bash
-go mod init hangman-go
-```
-
-3. Run the game:
-```bash
-go run main.go
-```
-
-### Building
-```bash
+go mod download
 go build -o hangman main.go
 ./hangman
+```
+
+#### Option 4: Docker
+```bash
+# Run directly
+docker run -it --rm [your-username]/hangman-go:latest
+
+# Or use docker-compose for development
+docker-compose up hangman
+```
+
+### Building from Source
+```bash
+git clone https://github.com/[your-username]/hangman-go.git
+cd hangman-go
+go mod download
+go build -ldflags="-s -w" -o hangman main.go
 ```
 
 ## 🏗️ Project Structure

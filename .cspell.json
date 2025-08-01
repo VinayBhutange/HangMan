@@ -1,0 +1,46 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "hangman",
+    "golang",
+    "github",
+    "ascii",
+    "struct",
+    "rune",
+    "slices",
+    "goroutine",
+    "dockerfile",
+    "codecov",
+    "gosec",
+    "golangci",
+    "ineffassign",
+    "misspell",
+    "govulncheck",
+    "cspell",
+    "buildx",
+    "goos",
+    "goarch",
+    "cgoenabled",
+    "ldflags",
+    "vinay",
+    "api",
+    "ui",
+    "cli",
+    "yml"
+  ],
+  "dictionaries": [
+    "en",
+    "companies",
+    "softwareTerms",
+    "node"
+  ],
+  "ignorePaths": [
+    "node_modules",
+    ".git",
+    "*.log",
+    "*.min.*",
+    "coverage.out",
+    "go.sum"
+  ]
+}

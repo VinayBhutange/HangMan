@@ -1,0 +1,199 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release'
+        required: true
+        default: 'v1.0.0'
+
+env:
+  GO_VERSION: '1.21'
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{ steps.create_release.outputs.id }}
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Generate changelog
+      id: changelog
+      run: |
+        # Get the previous tag
+        PREV_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
+        
+        # Generate changelog
+        if [ -n "$PREV_TAG" ]; then
+          CHANGELOG=$(git log --pretty=format:"- %s (%h)" $PREV_TAG..HEAD)
+        else
+          CHANGELOG=$(git log --pretty=format:"- %s (%h)")
+        fi
+        
+        # Set output
+        echo "changelog<<EOF" >> $GITHUB_OUTPUT
+        echo "$CHANGELOG" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+        
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref_name || github.event.inputs.tag }}
+        release_name: Hangman Game ${{ github.ref_name || github.event.inputs.tag }}
+        body: |
+          ## What's Changed
+          
+          ${{ steps.changelog.outputs.changelog }}
+          
+          ## Installation
+          
+          ### Quick Start
+          ```bash
+          # Download the binary for your platform from the assets below
+          # Make it executable (Linux/macOS)
+          chmod +x hangman-*
+          # Run the game
+          ./hangman-*
+          ```
+          
+          ### Using Go
+          ```bash
+          go install github.com/${{ github.repository }}@${{ github.ref_name || github.event.inputs.tag }}
+          ```
+          
+          ## Features
+          - 🎮 Interactive terminal-based gameplay
+          - 📊 Statistics tracking with persistent storage
+          - 🎯 Multiple difficulty levels (Easy, Medium, Hard)
+          - 🎨 Colorful ASCII art and terminal output
+          - 📝 Custom word management
+          - 🏆 Win streak tracking and scoring
+          
+          **Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ github.event.before }}...${{ github.ref_name || github.event.inputs.tag }}
+        draft: false
+        prerelease: false
+
+  build-and-upload:
+    name: Build and Upload Assets
+    runs-on: ubuntu-latest
+    needs: create-release
+    strategy:
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+            asset_name: hangman-linux-amd64
+          - goos: linux
+            goarch: arm64
+            asset_name: hangman-linux-arm64
+          - goos: windows
+            goarch: amd64
+            asset_name: hangman-windows-amd64.exe
+          - goos: darwin
+            goarch: amd64
+            asset_name: hangman-macos-amd64
+          - goos: darwin
+            goarch: arm64
+            asset_name: hangman-macos-arm64
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ env.GO_VERSION }}
+        
+    - name: Build binary
+      env:
+        GOOS: ${{ matrix.goos }}
+        GOARCH: ${{ matrix.goarch }}
+        CGO_ENABLED: 0
+      run: |
+        go build -ldflags="-s -w -X main.version=${{ github.ref_name || github.event.inputs.tag }}" -o ${{ matrix.asset_name }} main.go
+        
+    - name: Create archive
+      id: archive
+      run: |
+        if [[ "${{ matrix.goos }}" == "windows" ]]; then
+          zip -r ${{ matrix.asset_name }}.zip ${{ matrix.asset_name }} README.md LICENSE
+          echo "asset_name=${{ matrix.asset_name }}.zip" >> $GITHUB_OUTPUT
+          echo "content_type=application/zip" >> $GITHUB_OUTPUT
+        else
+          tar -czf ${{ matrix.asset_name }}.tar.gz ${{ matrix.asset_name }} README.md LICENSE
+          echo "asset_name=${{ matrix.asset_name }}.tar.gz" >> $GITHUB_OUTPUT
+          echo "content_type=application/gzip" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create-release.outputs.upload_url }}
+        asset_path: ${{ steps.archive.outputs.asset_name }}
+        asset_name: ${{ steps.archive.outputs.asset_name }}
+        asset_content_type: ${{ steps.archive.outputs.content_type }}
+
+  publish-docker:
+    name: Publish Docker Image
+    runs-on: ubuntu-latest
+    needs: create-release
+    if: github.event_name == 'push'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: |
+          ${{ secrets.DOCKER_USERNAME }}/hangman-go
+          ghcr.io/${{ github.repository }}
+        tags: |
+          type=ref,event=tag
+          type=raw,value=latest
+          
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        build-args: |
+          VERSION=${{ github.ref_name }}

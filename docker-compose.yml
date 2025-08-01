@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  hangman:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VERSION: dev
+    container_name: hangman-game
+    stdin_open: true
+    tty: true
+    volumes:
+      # Persist game statistics
+      - hangman_stats:/app/.hangman
+      # Mount source code for development (optional)
+      - .:/workspace
+    working_dir: /workspace
+    environment:
+      - TERM=xterm-256color
+    networks:
+      - hangman_network
+
+  # Development container with Go tools
+  hangman-dev:
+    image: golang:1.21-alpine
+    container_name: hangman-dev
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/workspace
+      - go_cache:/go/pkg/mod
+    working_dir: /workspace
+    environment:
+      - CGO_ENABLED=0
+      - GOOS=linux
+    networks:
+      - hangman_network
+    command: /bin/sh
+
+volumes:
+  hangman_stats:
+    driver: local
+  go_cache:
+    driver: local
+
+networks:
+  hangman_network:
+    driver: bridge
